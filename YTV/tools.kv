@@ -1,0 +1,649 @@
+<MYTextField>:
+
+<MDLabel>:
+	theme_text_color: "Custom"
+	text_color:[1,1,1,1] if app.theme_cls.theme_style=='Dark' else [0,0,0,1]
+
+
+<AppBase>:
+	BaseScreen:
+
+<Toolbar>:		
+
+<BaseScreen>:
+	name:'base_screen'
+	MDBoxLayout:
+		orientation:'vertical'
+		
+		Toolbar:
+			title:'[b][i]YTV'
+			anchor_title:'center'
+		Sm:		
+
+<Sm>:
+	TmScreen:
+	MovieScreen:
+	CaptchaScreen:
+	HistoryScreen:
+
+	
+<TmScreen>:
+	name:'tmscreen'
+	Tm:
+		TB:
+<HistoryScreen>:
+	name:'historyscreen'
+	MDGridLayout:
+		cols:1
+		spacing:dp(10)
+		MDBoxLayout:
+			size_hint:1,None
+			MDIconButton:
+				icon:"arrow-left-bold"
+				on_release:app.on_key(1,27,(26))
+			MDLabel:
+				size_hint:1,None
+				halign:'center'
+				markup:True
+				font_name:'fonts/title'
+				text:'[b]'+'History'
+			MDTextButton:
+				size_hint:1,None
+				halign:'center'
+				markup:True
+				#font_name:'fonts/title'
+				text:'[i][u]'+'Clear?'
+				on_release:root.confirm_delete()
+				
+		RecycleView:
+			id: hist_rv
+			size_hint_y:
+			key_viewclass: 'viewclass'
+			key_size: 'height'	
+			RecycleGridLayout:
+				id: hist_rb
+				default_size: None, dp(100)
+				default_size_hint: 1, None
+				size_hint_y: None
+				height: self.minimum_height
+				cols:1
+				spacing:dp(10)
+
+<MovieScreen>:
+	name:'moviescreen'
+	MDBoxLayout:
+		orientation:'vertical'
+		spacing:dp(10)
+		MDBoxLayout:
+			size_hint:1,None
+			MDIconButton:
+				icon:"arrow-left-bold"
+				on_release:root.close_screen()
+			MDLabel:
+				size_hint:1,None
+				halign:'center'
+				markup:True
+				font_name:'fonts/title'
+				text:'[b][u]'+root.title
+			MDIconButton:
+				id:add_bk
+				icon:
+				on_release:root.bookmark()
+		MDBoxLayout:
+			size_hint_y:.4
+			canvas.before:
+				Color:
+					rgba:app.theme_cls.primary_dark[:-1]+[.2]
+				RoundedRectangle:
+					size:self.size
+					pos: self.pos
+			LoadImg:
+				id:loadimg
+				Image:
+					id:thumb
+					allow_stretch:True
+					keep_ratio: True
+					source:
+					nocache:True
+			ScrollView:
+				id:info_scroll_view
+				#bar_pos_y:'left'
+				bar_width:dp(5)
+				bar_inactive_color:.7,.7,.7,.4
+				padding:dp(10)	
+				MDLabel:
+					canvas.before:
+						Color:
+							rgba:0,0,0,.2
+						RoundedRectangle:
+							size:self.size
+							pos: self.pos
+					id:info
+					text:root.info
+					font_name:'fonts/movie_info'
+					font_style: 'Subtitle1'
+					valign:'top'
+					size_hint_y:None
+					height:self.texture_size[1]
+		ScreenManager:
+			id:sm
+			SeasonScreen:
+				id:ss
+			FormatScreen:
+				id:fs
+<SeasonScreen>:
+	name:'season_screen'
+	MDBoxLayout:
+		orientation:'vertical'			
+		RecycleView:
+			id: season_rv
+			size_hint_y:None
+			key_viewclass: 'viewclass'
+			key_size: 'height'
+			bar_width:dp(8)
+			bar_inactive_color:.7,.7,.7,.4		
+			RecycleBoxLayout:
+				id: season_rb
+				default_size: None, dp(50)
+				default_size_hint: None, None
+				size_hint_x: None
+				width: self.minimum_width
+				orientation: 'horizontal'
+				spacing:dp(2)
+		RecycleView:
+			id: others_rv
+			size_hint_y:
+			key_viewclass: 'viewclass'
+			key_size: 'height'	
+			RecycleBoxLayout:
+				id: others_rb
+				default_size: None, None
+				default_size_hint: 1, None
+				size_hint_y: None
+				height: self.minimum_height
+				orientation: 'vertical'
+				spacing:dp(2)
+<FormatScreen>:
+	name:'format_screen'
+	MDBoxLayout:
+		# size_hint:1,None
+		orientation:'vertical'
+		MDBoxLayout:
+			size_hint:1,None
+			MDIconButton:
+				icon:"close"
+				on_release:
+					exec("root.manager.current='season_screen'")
+			MDLabel:
+				size_hint:1,None
+				halign:'center'
+				text:'Select Video Format'+root.season_episode	
+		RecycleView:
+			id: format_rv
+			size_hint_y:
+			key_viewclass: 'viewclass'
+			key_size: 'height'	
+			RecycleBoxLayout:
+				id: format_rb
+				default_size: None, None
+				default_size_hint: 1, None
+				size_hint_y: None
+				height: self.minimum_height
+				orientation: 'vertical'
+				spacing:dp(2)
+
+<EpisodeButton>:
+	text:
+	IconRightWidget:
+		icon:'download'
+		on_release: root.open_download_options()
+	
+
+<CaptchaScreen>:
+	name:'captchascreen'
+	MDBoxLayout:
+		orientation:'vertical'
+		spacing:dp(20)
+		MDBoxLayout:
+			size_hint:1,None
+			MDIconButton:
+				icon:"arrow-left-bold"
+				on_release:root.close_screen()
+			MDLabel:
+				size_hint:1,None
+				halign:'center'
+				text:'Solve Captcha'+root.season_episode
+		MDBoxLayout:
+			padding:dp(5)
+			size_hint:1,.25
+			Image:
+				id:c_image
+				nocache:True
+				allow_stretch:True
+				keep_ratio:True
+				#source:''
+		MDBoxLayout:
+			id:form
+			size_hint:1,None
+			padding:dp(20)
+			spacing:dp(10)
+			MYTextField:
+				id:c_text
+				use_bubble:True
+				on_text_validate:root.submit()
+				current_hint_text_color:1,1,1,1
+				hint_text:'What do you see?'
+			MDRaisedButton:
+				text:'Submit'
+				on_release:root.submit()
+		RecycleView:
+			id: options_rv
+			size_hint_y:
+			key_viewclass: 'viewclass'
+			key_size: 'height'	
+			RecycleBoxLayout:
+				id: options_rb
+				default_size: None, None
+				default_size_hint: 1, None
+				size_hint_y: None
+				height: self.minimum_height
+				orientation: 'vertical'
+				spacing:dp(10)
+				padding:dp(20)
+	
+	
+<TB@MDBottomNavigation>:
+	#lock_swiping:True
+	text_color_normal:.3,.3,.3,1
+	default_tab:1
+	tab_bar_height:dp(35)
+	#SearchTab:
+	HomeTab:
+	BookTab:
+	#DownloadScreen removed for now
+	#DownloadScreen:
+	
+	
+<SearchTab>:
+	name:'s1'
+	text:'Search'
+	icon:'search-web'
+	cols:1
+	padding:dp(5)
+
+	MDBoxLayout:
+		orientation:'vertical'
+		
+		MDBoxLayout:
+			#cols:3
+			padding:dp(10)
+			adaptive_height:True
+		
+			MYTextField:
+				id:text_field
+				text:''
+				hint_text:'Search TV series by name'
+				current_hint_text_color:1,1,1,1
+				on_text_validate:root.th_search()
+			LoadImg:
+				size_hint_x:None
+				start_anim:True
+				MDIconButton:
+					id:search_but
+					icon:'search-web'
+					on_release: root.th_search()
+		RecycleView:
+			id: search_rv
+			key_viewclass: 'viewclass'
+			key_size: 'height'	
+			RecycleGridLayout:
+				id: search_rb
+				default_size: None,dp(200)
+				default_size_hint: 1, None
+				size_hint_y: None
+				height: self.minimum_height
+				cols:1
+				spacing:dp(5)
+
+<GenreButton>:
+	ripple_scale: 0.7
+	
+<LatestButton>:
+	text:
+	IconRightWidget:
+		icon:'arrow-top-right-thick'
+		on_release: root.do_search()
+	
+	
+<HomeTab>:
+	name:'s2'
+	text:'Home'
+	icon:'home'
+	orientation:'vertical'
+	
+
+	MDBoxLayout:
+		size_hint_y:
+		orientation:'vertical'
+		MDBoxLayout:
+			size_hint_y:None
+			PageButton:
+				id:latest_button
+				group:'explore_options'
+				state:'down'
+				allow_no_selection: False
+				text: 'Recent Updates'
+				size_hint:1,None
+				on_release:
+					root.ids.sm_for_explore.current='latest'
+					root.refresh_latest()
+			PageButton:
+				id:s1_button
+				group:'explore_options'
+				state:'normal'
+				allow_no_selection: False
+				text: 'Search'
+				size_hint:1,None
+				on_release: root.ids.sm_for_explore.current='s1'
+			PageButton:
+				group:'explore_options'
+				state:'normal'
+				allow_no_selection: False
+				size_hint:1,None
+				text:'Explore'
+				on_release: root.ids.sm_for_explore.current='explore_genre'
+
+		ScreenManager:
+			id:sm_for_explore
+			transition:
+			Screen:
+				name:'latest'
+	
+				RecycleView:
+					id: latest_rv
+					size_hint_y:
+					key_viewclass: 'viewclass'
+					key_size: 'height'
+					bar_width:dp(5)
+					bar_inactive_color:.7,.7,.7,.4	
+					RecycleBoxLayout:
+						id: latest_rb
+						default_size: None,None
+						default_size_hint: 1, None
+						size_hint_y: None
+						height: self.minimum_height
+						orientation: 'vertical'
+						# cols:1
+						spacing:dp(5)	
+			SearchTab:
+			Screen:
+				name:'explore_genre'
+				BoxLayout:	
+					orientation:'vertical'	
+					MDFlatButton:
+						size_hint:1,None
+						markup:True
+						text:'Select Genres:'+ root.genre
+						on_release: 
+							root.show_genres()			
+					RecycleView:
+						id: explore_rv
+						size_hint_y:
+						key_viewclass: 'viewclass'
+						key_size: 'height'
+						bar_width:dp(5)
+						bar_inactive_color:.7,.7,.7,.4	
+						RecycleGridLayout:
+							id: explore_rb
+							default_size: None,dp(200)
+							default_size_hint: 1, None
+							size_hint_y: None
+							height: self.minimum_height
+							cols:1
+							spacing:dp(5)
+					RecycleView:
+						id: pages_rv
+						size_hint_y:None
+						key_viewclass: 'viewclass'
+						key_size: 'height'
+						bar_width:dp(7)
+						bar_inactive_color:.7,.7,.7,.4
+						
+						RecycleBoxLayout:
+							id: pages_rb
+							default_size: None, dp(40)
+							default_size_hint: None, None
+							size_hint: None,None
+							width: self.minimum_width
+							orientation: 
+							spacing:dp(2)
+
+<PageButton>:
+	allow_no_selection:False
+
+<Tab@MDBoxLayout+MDTabsBase>:			
+<DownloadScreen>:
+	name:'downloadscreen'
+	text:'Downloading'
+	icon:'download-multiple'
+	RecycleView:
+		id: downloading_rv
+		size_hint_y:
+		key_viewclass: 'viewclass'
+		key_size: 'height'
+		bar_width:dp(5)
+		bar_inactive_color:.7,.7,.7,.4	
+		RecycleGridLayout:
+			id: downloading_rb
+			default_size: None,None
+			default_size_hint: 1, None
+			size_hint_y: None
+			height: self.minimum_height
+			#orientation: 'vertical'
+			cols:1
+			spacing:dp(5)	
+		
+<DownloadCard>:
+	text:root.name
+	secondary_text:root.status
+	tertiary_text:str(int(root.value))+'/'+str(int(root.max))+ ' M'
+	
+	IconRightWidget:
+		icon:'cancel'	
+
+
+<BookTab>:
+	name:'s3'
+	icon:'star'
+	text:'BookMarks'
+	
+	MDBoxLayout:
+		orientation:'vertical'
+		MDBoxLayout:
+			adaptive_height:True
+			MDRectangleFlatButton:
+				size_hint_y:None
+				md_bg_color:0,0,0,1
+				icon:'trash-can'
+				text:'Clear Bookmarks'
+				on_release:root.confirm_delete()
+			MDRectangleFlatButton:
+				size_hint_y:None
+				md_bg_color:0,0,0,1
+				#icon:'trash-can'
+				text:'History'
+				on_release:root.open_history()
+		RecycleView:
+			id: book_rv
+			size_hint_y:
+			key_viewclass: 'viewclass'
+			key_size: 'height'	
+			RecycleGridLayout:
+				id: book_rb
+				default_size: None, dp(200)
+				default_size_hint: 1, None
+				size_hint_y: None
+				height: self.minimum_height
+				cols:3
+				spacing:dp(2)
+	
+<LoadImg>:
+	do_rotation: False
+	do_translation:False
+	do_scale:False	
+
+<ResultCard>:
+	Image:
+		id:thumb
+		nocache:True
+		keep_ratio:True
+		allow_stretch:True
+	MDBoxLayout:
+		orientation:'vertical'	
+		GenreButton:
+			canvas.before:
+				Color:
+					rgba:app.theme_cls.primary_dark[:-1]+[.4]
+				Rectangle:
+					size:self.size
+					pos: self.pos
+			id:name
+			halign:'center'
+			valign:'top'
+			#font_size:dp(15)
+			size_hint:1,None
+			font_name:'fonts/movie_name'
+			# font_size:dp(20)
+			multiline:True
+			markup:True
+			text:'[u][b]'+root.name_of_movie+'[/u][/b]'
+		ScrollView:
+			padding:dp(10)
+			do_scroll_y:False
+			do_scroll_x:False
+			MDLabel:
+				canvas.before:
+					Color:
+						rgba:0,0,0,1
+					Rectangle:
+						size:self.size
+						pos: self.pos
+				markup:True
+				text: root.details
+				size_hint_y:None
+				font_style: 'Subtitle1'
+				#font_size:dp(15)
+				height:self.texture_size[1]
+	
+<ResultCard_@MDCard>:
+	orientation:'vertical'
+	size_hint:None,None
+	LoadImg:
+		id:loadimg
+		size_hint_y:
+		Image:
+			id:thumb
+			allow_stretch:True
+			keep_ratio:  True
+			source:
+			nocache:True
+	GenreButton:
+		canvas.before:
+			Color:
+				rgba:app.theme_cls.primary_dark[:-1]+[.4]
+			Rectangle:
+				size:self.size
+				pos: self.pos
+		id:name
+		halign:'center'
+		valign:'top'
+		#font_size:dp(15)
+		size_hint:1,None
+		font_name:'fonts/movie_name'
+		# font_size:dp(20)
+		multiline:True
+		markup:True
+		text:'[u][b]'+root.name_of_movie+'[/u][/b]'
+		#on_release: root.open_movie()
+
+<BookCard>:
+	orientation:'vertical'
+	Image:
+		id:b_img
+		nocache:True
+		source:root.img_src
+		allow_stretch:True
+		keep_ratio:True
+	MDLabel:
+		canvas.before:
+			Color:
+				rgba:0,0,0,1
+			Rectangle:
+				size:self.size
+				pos: self.pos
+		id:b_name
+		text:root.name
+		font_name:'fonts/movie_name'
+		halign:'center'
+		size_hint_y:None
+	MDBoxLayout:
+		size_hint_y:None
+		canvas.before:
+			Color:
+				rgba:app.theme_cls.primary_dark[:-1]+[.4]
+			Rectangle:
+				size:self.size
+				pos: self.pos
+		MDRaisedButton:
+			icon:'arrow-top-left-thick'
+			text:root.open_button_text
+			on_release:root.open_movie()
+			
+		MDIconButton:
+			icon:'delete'
+			text:'remove'
+			on_release:root.confirm_delete()
+
+
+<ResultCard2@MDCard>:
+	orientation:'vertical'
+	size_hint_y:None
+	height:dp(100)
+	LoadImg:
+		id:loadimg
+		Image:
+			id:thumb
+			allow_stretch:True
+			keep_ratio: True
+			source:
+			nocache:True
+	BoxLayout:
+		orientation:'vertical'
+		size_hint_y:1
+		MDLabel:
+			id:name
+			halign:'center'
+			valign:'top'
+			font_size:dp(15)
+			sze_hint:1,None
+			markup:True
+			text:
+			on_ref_press:print('pressed')
+	
+		MDIconButton:
+			icon:
+			hlign:'right'
+			fnt_size:dp(5)
+			sze_hint:1,None
+			txt:'See more'
+		MDLabel:
+			id:info
+			sze_hint:
+			markup: True
+			text:
+			shorten: False
+			shorten_from:'right'
+			valign:'top'
+			font_size:dp(13)
+			on_ref_press:root.open_movie()
+		
