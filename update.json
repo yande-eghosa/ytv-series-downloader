@@ -1,1 +1,0 @@
-{"version": 1, "details": "Version 1\nClick Update to get the latest app\nAll bugs fixed", "type": 0, "link": "import webbrowser as wb\nwb.open('''https://www.google.com''')", "date": "2020-09-16", "show": false}
